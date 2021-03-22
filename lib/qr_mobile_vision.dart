@@ -42,7 +42,7 @@ class QrMobileVision {
     required int height,
     required QRCodeHandler qrCodeHandler,
     List<BarcodeFormats>? formats = _defaultBarcodeFormats,
-    bool useFrontCamera = false,
+    required bool useFrontCamera = false,
   }) async {
     final _formats = formats ?? _defaultBarcodeFormats;
     assert(_formats.length > 0);
@@ -52,10 +52,10 @@ class QrMobileVision {
     channelReader.setQrCodeHandler(qrCodeHandler);
     var details = await _channel.invokeMethod('start', {
       'targetWidth': width,
-      'useFrontCamera': useFrontCamera,
       'targetHeight': height,
       'heartbeatTimeout': 0,
       'formats': formatStrings,
+      'useFrontCamera': useFrontCamera,
     });
 
     // invokeMethod returns Map<dynamic,...> in dart 2.0
