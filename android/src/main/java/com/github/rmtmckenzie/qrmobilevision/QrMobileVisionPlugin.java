@@ -159,6 +159,7 @@ public class QrMobileVisionPlugin implements MethodCallHandler, QrReaderCallback
                 } else {
                     lastHeartbeatTimeout = methodCall.argument("heartbeatTimeout");
                     Integer targetWidth = methodCall.argument("targetWidth");
+                    Boolean useFrontCamera = methodCall.argument("useFrontCamera");
                     Integer targetHeight = methodCall.argument("targetHeight");
                     List<String> formatStrings = methodCall.argument("formats");
 
@@ -176,7 +177,8 @@ public class QrMobileVisionPlugin implements MethodCallHandler, QrReaderCallback
                     readingInstance = new ReadingInstance(reader, textureEntry, result);
                     try {
                         reader.start(
-                            lastHeartbeatTimeout == null ? 0 : lastHeartbeatTimeout
+                            lastHeartbeatTimeout == null ? 0 : lastHeartbeatTimeout,
+                            useFrontCamera == null ? false : useFrontCamera
                         );
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -202,6 +204,13 @@ public class QrMobileVisionPlugin implements MethodCallHandler, QrReaderCallback
             case "heartbeat": {
                 if (readingInstance != null) {
                     readingInstance.reader.heartBeat();
+                }
+                result.success(null);
+                break;
+            }
+            case "toggleFlash": {
+                if (readingInstance != null && !waitingForPermissionResult) {
+                    readingInstance.reader.toggleFlash();
                 }
                 result.success(null);
                 break;

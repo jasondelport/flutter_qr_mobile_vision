@@ -42,6 +42,7 @@ class QrMobileVision {
     required int height,
     required QRCodeHandler qrCodeHandler,
     List<BarcodeFormats>? formats = _defaultBarcodeFormats,
+    required bool useFrontCamera,
   }) async {
     final _formats = formats ?? _defaultBarcodeFormats;
     assert(_formats.length > 0);
@@ -51,6 +52,7 @@ class QrMobileVision {
     channelReader.setQrCodeHandler(qrCodeHandler);
     var details = await _channel.invokeMethod('start', {
       'targetWidth': width,
+      'useFrontCamera': useFrontCamera,
       'targetHeight': height,
       'heartbeatTimeout': 0,
       'formats': formatStrings,
@@ -70,6 +72,10 @@ class QrMobileVision {
   static Future stop() {
     channelReader.setQrCodeHandler(null);
     return _channel.invokeMethod('stop').catchError(print);
+  }
+
+  static Future toggleFlash() {
+    return _channel.invokeMethod('toggleFlash').catchError(print);
   }
 
   static Future heartbeat() {

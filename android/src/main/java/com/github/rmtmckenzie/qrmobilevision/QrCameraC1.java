@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Surface;
@@ -77,12 +78,15 @@ class QrCameraC1 implements QrCamera {
     }
 
     @Override
-    public void start() throws QrReader.Exception {
+    public void start(boolean useFrontCamera) throws QrReader.Exception {
+        final int requestedFacing = useFrontCamera
+            ? android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT
+            : android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK;
         int numberOfCameras = android.hardware.Camera.getNumberOfCameras();
         info = new android.hardware.Camera.CameraInfo();
         for (int i = 0; i < numberOfCameras; i++) {
             android.hardware.Camera.getCameraInfo(i, info);
-            if (info.facing == android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK) {
+            if (info.facing == requestedFacing) {
                 camera = android.hardware.Camera.open(i);
                 break;
             }
@@ -238,5 +242,24 @@ class QrCameraC1 implements QrCamera {
             }
         }
         return s;
+    }
+
+    @Override
+    public void toggleFlash() {
+        Camera.Parameters p = camera.getParameters();
+
+        if (p.getFlashMode() == Camera.Parameters.FLASH_MODE_ON) {
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        } else if (p.getFlashMode() == Camera.Parameters.FLASH_MODE_OFF) {
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        } else if (p.getFlashMode() == Camera.Parameters.FLASH_MODE_AUTO) {
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+        } else if (p.getFlashMode() == Camera.Parameters.FLASH_MODE_TORCH) {
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        } else {
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+        }
+
+        camera.setParameters(p);
     }
 }

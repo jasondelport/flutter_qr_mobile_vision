@@ -25,6 +25,7 @@ class QrCamera extends StatefulWidget {
     WidgetBuilder? offscreenBuilder,
     ErrorCallback? onError,
     this.formats,
+    this.useFrontCamera,
   })  : notStartedBuilder = notStartedBuilder ?? _defaultNotStartedBuilder,
         offscreenBuilder = offscreenBuilder ?? notStartedBuilder ?? _defaultOffscreenBuilder,
         onError = onError ?? _defaultOnError,
@@ -37,6 +38,7 @@ class QrCamera extends StatefulWidget {
   final WidgetBuilder offscreenBuilder;
   final ErrorCallback onError;
   final List<BarcodeFormats>? formats;
+  final bool useFrontCamera;
 
   @override
   QrCameraState createState() => QrCameraState();
@@ -53,6 +55,17 @@ class QrCameraState extends State<QrCamera> with WidgetsBindingObserver {
   dispose() {
     WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(QrCamera oldWidget) {
+    if (oldWidget.useFrontCamera != widget.useFrontCamera) {
+      QrMobileVision.stop();
+      setState(() {
+        _asyncInitOnce = null;
+      });
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -79,6 +92,7 @@ class QrCameraState extends State<QrCamera> with WidgetsBindingObserver {
       height: height.toInt(),
       qrCodeHandler: widget.qrCodeCallback,
       formats: widget.formats,
+      useFrontCamera: widget.useFrontCamera,
     );
     return previewDetails;
   }
@@ -99,6 +113,12 @@ class QrCameraState extends State<QrCamera> with WidgetsBindingObserver {
   void stop() {
     (() async {
       await QrMobileVision.stop();
+    })();
+  }
+
+  void toggleFlash() {
+    (() async {
+      await QrMobileVision.toggleFlash();
     })();
   }
 

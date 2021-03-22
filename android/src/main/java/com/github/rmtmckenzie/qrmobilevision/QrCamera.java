@@ -1,7 +1,8 @@
 package com.github.rmtmckenzie.qrmobilevision;
 
 interface QrCamera {
-    void start() throws QrReader.Exception;
+    void start(final boolean useFrontCamera) throws QrReader.Exception;
+    void toggleFlash();
     void stop();
     int getOrientation();
     int getWidth();

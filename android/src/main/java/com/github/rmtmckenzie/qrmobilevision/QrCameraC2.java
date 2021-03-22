@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -34,6 +35,7 @@ import static android.hardware.camera2.CameraMetadata.CONTROL_AF_MODE_AUTO;
 import static android.hardware.camera2.CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_PICTURE;
 import static android.hardware.camera2.CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_VIDEO;
 import static android.hardware.camera2.CameraMetadata.LENS_FACING_BACK;
+import static android.hardware.camera2.CameraMetadata.LENS_FACING_FRONT;
 
 /**
  * Implements QrCamera using Camera2 API
@@ -44,6 +46,7 @@ class QrCameraC2 implements QrCamera {
 
     private static final String TAG = "cgr.qrmv.QrCameraC2";
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+    private boolean isFlashOn = false;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -120,7 +123,8 @@ class QrCameraC2 implements QrCamera {
     }
 
     @Override
-    public void start() throws QrReader.Exception {
+    public void start(boolean useFrontCamera) throws QrReader.Exception {
+        final int requestedFacing = useFrontCamera ? LENS_FACING_FRONT : LENS_FACING_BACK;
         CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
 
         if (manager == null) {
@@ -133,7 +137,7 @@ class QrCameraC2 implements QrCamera {
             for (String id : cameraIdList) {
                 CameraCharacteristics cameraCharacteristics = manager.getCameraCharacteristics(id);
                 Integer integer = cameraCharacteristics.get(CameraCharacteristics.LENS_FACING);
-                if (integer != null && integer == LENS_FACING_BACK) {
+                if (integer != null && integer == requestedFacing) {
                     cameraId = id;
                     break;
                 }
@@ -366,4 +370,34 @@ class QrCameraC2 implements QrCamera {
         }
         return s;
     }
+
+    public void turnOnFlashLight() {
+        try {
+            previewBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+            previewSession.setRepeatingRequest(previewBuilder.build(), null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void turnOffFlashLight() {
+        try {
+            previewBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
+            previewSession.setRepeatingRequest(previewBuilder.build(), null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void toggleFlash() {
+        if (isFlashOn) {
+            turnOffFlashLight();
+            isFlashOn = false;
+        } else {
+            turnOnFlashLight();
+            isFlashOn = true;
+        }
+    }
+
 }
