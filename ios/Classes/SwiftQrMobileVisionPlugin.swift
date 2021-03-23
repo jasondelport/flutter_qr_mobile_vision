@@ -100,7 +100,7 @@ public class SwiftQrMobileVisionPlugin: NSObject, FlutterPlugin {
       //      reader?.heartBeat();
       result(nil)
 	 case "toggleFlash":
-		 toggleTorch();
+		 toggleFlash();
 		 result(nil);
     default : result(FlutterMethodNotImplemented);
     }
