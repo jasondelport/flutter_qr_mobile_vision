@@ -25,8 +25,8 @@ class QrCamera extends StatefulWidget {
     WidgetBuilder? offscreenBuilder,
     ErrorCallback? onError,
     this.formats,
-    this.useFrontCamera,
-  })  : notStartedBuilder = notStartedBuilder ?? _defaultNotStartedBuilder,
+    required this.useFrontCamera,
+  })   : notStartedBuilder = notStartedBuilder ?? _defaultNotStartedBuilder,
         offscreenBuilder = offscreenBuilder ?? notStartedBuilder ?? _defaultOffscreenBuilder,
         onError = onError ?? _defaultOnError,
         super(key: key);
