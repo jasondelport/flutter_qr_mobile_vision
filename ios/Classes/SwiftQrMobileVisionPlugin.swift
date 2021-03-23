@@ -2,6 +2,7 @@ import Flutter
 import UIKit
 import MLKitVision
 import MLKitBarcodeScanning
+import AVFoundation
 
 class MapArgumentReader {
   
@@ -100,15 +101,15 @@ public class SwiftQrMobileVisionPlugin: NSObject, FlutterPlugin {
       //      reader?.heartBeat();
       result(nil)
 	 case "toggleFlash":
-		 toggleFlash();
+		 self.toggleFlash();
 		 result(nil);
     default : result(FlutterMethodNotImplemented);
     }
   }
   
-  func toggleFlash() {
-      guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
-      guard device.hasTorch else { return }
+  private func toggleFlash() {
+	  guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+	  guard device.hasTorch else { return }
 
       do {
           try device.lockForConfiguration()
