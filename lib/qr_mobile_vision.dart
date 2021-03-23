@@ -42,7 +42,7 @@ class QrMobileVision {
     required int height,
     required QRCodeHandler qrCodeHandler,
     List<BarcodeFormats>? formats = _defaultBarcodeFormats,
-    required bool useFrontCamera = false,
+    required bool useFrontCamera,
   }) async {
     final _formats = formats ?? _defaultBarcodeFormats;
     assert(_formats.length > 0);

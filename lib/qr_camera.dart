@@ -39,8 +39,8 @@ class QrCamera extends StatefulWidget {
   final ErrorCallback onError;
   final List<BarcodeFormats>? formats;
   final bool useFrontCamera;
-  
-  void toggleFlash() {
+
+  toggleFlash() {
     (() async {
       await QrMobileVision.toggleFlash();
     })();
