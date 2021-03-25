@@ -157,6 +157,7 @@ class QrCameraState extends State<QrCamera> with WidgetsBindingObserver {
                   targetWidth: constraints.maxWidth,
                   targetHeight: constraints.maxHeight,
                   fit: widget.fit,
+                  useFrontCamera: widget.useFrontCamera,
                 ),
               );
 
@@ -185,12 +186,14 @@ class Preview extends StatelessWidget {
   final int? textureId;
   final int? sensorOrientation;
   final BoxFit fit;
+  final bool useFrontCamera;
 
   Preview({
     required PreviewDetails previewDetails,
     required this.targetWidth,
     required this.targetHeight,
     required this.fit,
+    required this.useFrontCamera,
   })   : textureId = previewDetails.textureId,
         width = previewDetails.width!.toDouble(),
         height = previewDetails.height!.toDouble(),
@@ -200,6 +203,7 @@ class Preview extends StatelessWidget {
   Widget build(BuildContext context) {
     return NativeDeviceOrientationReader(
       builder: (context) {
+        bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
         var nativeOrientation = NativeDeviceOrientationReader.orientation(context);
 
         int nativeRotation = 0;
@@ -208,13 +212,13 @@ class Preview extends StatelessWidget {
             nativeRotation = 0;
             break;
           case NativeDeviceOrientation.landscapeRight:
-            nativeRotation = 90;
+            nativeRotation = (isIOS && useFrontCamera) ? 270 : 90;
             break;
           case NativeDeviceOrientation.portraitDown:
             nativeRotation = 180;
             break;
           case NativeDeviceOrientation.landscapeLeft:
-            nativeRotation = 270;
+            nativeRotation = (isIOS && useFrontCamera) ? 90 : 270;
             break;
           case NativeDeviceOrientation.unknown:
           default:
